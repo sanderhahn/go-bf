@@ -40,6 +40,9 @@ func TestHello(t *testing.T) {
 
 // http://www.linusakesson.net/programming/brainfuck/output.txt
 func TestLife(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping life test in short mode")
+	}
 	// ReadFile is only used for this test
 	life, err := ioutil.ReadFile("life.bf")
 	if err != nil {

@@ -55,10 +55,12 @@ func readLoop(r io.Reader) ([]byte, error) {
 		if code == '[' {
 			level++
 		} else if code == ']' {
-			if level > 0 {
+			if level == 0 {
+				break
+			} else if level > 0 {
 				level--
 			} else {
-				break
+				return nil, errInvalidNesting
 			}
 		}
 		buf.WriteByte(code)
@@ -75,12 +77,16 @@ func writeByte(w io.Writer, b byte) error {
 	return nil
 }
 
-func (i *Interpreter) checkMemory() {
+func (i *Interpreter) checkMemory() error {
+	if i.ptr < 0 {
+		return errMemoryError
+	}
 	// increase memory on demand
 	if i.ptr >= len(i.memory) {
 		i.memory = append(i.memory, memory()...)
 		// log.Printf("memory increased to %d\n", len(i.memory))
 	}
+	return nil
 }
 
 // Interpret the instructions from the reader
@@ -99,15 +105,19 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 		case '<':
 			i.ptr--
 		case '+':
-			i.checkMemory()
+			if err := i.checkMemory(); err != nil {
+				return err
+			}
 			i.memory[i.ptr]++
 		case '-':
-			if i.ptr < 0 {
-				return errMemoryError
+			if err := i.checkMemory(); err != nil {
+				return err
 			}
 			i.memory[i.ptr]--
 		case '.':
-			i.checkMemory()
+			if err := i.checkMemory(); err != nil {
+				return err
+			}
 			b := i.memory[i.ptr]
 			err := writeByte(i.w, b)
 			if err != nil {
@@ -116,6 +126,9 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 		case ',':
 			b, err := readByte(i.r)
 			if err != nil {
+				return err
+			}
+			if err := i.checkMemory(); err != nil {
 				return err
 			}
 			i.memory[i.ptr] = b

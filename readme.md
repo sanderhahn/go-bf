@@ -1,9 +1,12 @@
-# BrainFuck
+# Brainfuck
 
 The interpreter could be more efficient [File.Seek](https://golang.org/pkg/os/#File.Seek)
 was used. However the assignment required the use of `io.Reader`.
 
 ```bash
+# run short test
+$ go test -test.short
+
 $ go install github.com/sanderhahn/bf/...
 
 $ bf life.bf
