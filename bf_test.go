@@ -44,7 +44,7 @@ func TestLife(t *testing.T) {
 		t.Skip("skipping life test in short mode")
 	}
 	// ReadFile is only used for this test
-	life, err := ioutil.ReadFile("life.bf")
+	life, err := ioutil.ReadFile("examples/life.bf")
 	if err != nil {
 		t.Fail()
 	}

@@ -125,7 +125,10 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 			}
 		case ',':
 			b, err := readByte(i.r)
-			if err != nil {
+			if err == io.EOF {
+				// dbf2c.bf expects zero as EOF
+				b = 0
+			} else if err != nil {
 				return err
 			}
 			if err := i.checkMemory(); err != nil {

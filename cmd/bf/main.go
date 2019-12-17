@@ -2,9 +2,10 @@ package main
 
 import (
 	"bufio"
-	"github.com/sanderhahn/bf"
 	"log"
 	"os"
+
+	"github.com/sanderhahn/bf"
 )
 
 func main() {
@@ -14,7 +15,7 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
-		i := bf.NewInterpreter(os.Stdin, os.Stdout)
+		i := bf.NewInterpreter(os.Stdout, os.Stdin)
 		input := bufio.NewReader(file)
 		if err := i.Interpret(input); err != nil {
 			log.Fatal(err)
