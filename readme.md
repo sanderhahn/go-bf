@@ -1,7 +1,6 @@
 # Brainfuck
 
-The interpreter could be more efficient [File.Seek](https://golang.org/pkg/os/#File.Seek)
-was used. However the assignment required the use of `io.Reader`.
+The interpreter could be more efficient if the interpeter did a single pass to determine code jump locations for loops. However the assignment required the use of `io.Reader` and processing instructions without knowing all input at once.
 
 ```bash
 # run short test
