@@ -14,3 +14,5 @@ $ bf life.bf
 
 - [Brainfuck](http://www.linusakesson.net/programming/brainfuck/index.php)
 - [Conway's Game of Life](http://pi.math.cornell.edu/~lipa/mec/lesson6.html)
+
+[Extended Brainfuck](https://esolangs.org/wiki/Extended_Brainfuck) requires reading the data behind the program file to initialize storage.
