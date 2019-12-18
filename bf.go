@@ -10,7 +10,6 @@ const memorySize = 2048
 const bufSize = 64
 
 var errInvalidNesting = errors.New("Invalid loop nesting")
-var errMemoryError = errors.New("Invalid memory access")
 
 // Interpreter has the state for a single interpreter
 type Interpreter struct {
@@ -57,10 +56,9 @@ func readLoop(r io.Reader) ([]byte, error) {
 		} else if code == ']' {
 			if level == 0 {
 				break
-			} else if level > 0 {
+			}
+			if level > 0 {
 				level--
-			} else {
-				return nil, errInvalidNesting
 			}
 		}
 		buf.WriteByte(code)
@@ -77,10 +75,7 @@ func writeByte(w io.Writer, b byte) error {
 	return nil
 }
 
-func (i *Interpreter) checkMemory() error {
-	if i.ptr < 0 {
-		return errMemoryError
-	}
+func (i *Interpreter) increaseMemory() error {
 	// increase memory on demand
 	if i.ptr >= len(i.memory) {
 		i.memory = append(i.memory, memory()...)
@@ -102,22 +97,16 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 		switch code {
 		case '>':
 			i.ptr++
+			if err := i.increaseMemory(); err != nil {
+				return err
+			}
 		case '<':
 			i.ptr--
 		case '+':
-			if err := i.checkMemory(); err != nil {
-				return err
-			}
 			i.memory[i.ptr]++
 		case '-':
-			if err := i.checkMemory(); err != nil {
-				return err
-			}
 			i.memory[i.ptr]--
 		case '.':
-			if err := i.checkMemory(); err != nil {
-				return err
-			}
 			b := i.memory[i.ptr]
 			err := writeByte(i.w, b)
 			if err != nil {
@@ -129,9 +118,6 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 				// dbf2c.bf expects zero as EOF
 				b = 0
 			} else if err != nil {
-				return err
-			}
-			if err := i.checkMemory(); err != nil {
 				return err
 			}
 			i.memory[i.ptr] = b
