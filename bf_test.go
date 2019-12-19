@@ -38,12 +38,22 @@ func TestHello(t *testing.T) {
 	}
 }
 
+// go test -bench=. -run=Hannoi
+func BenchmarkHannoi(b *testing.B) {
+	hannoi, err := ioutil.ReadFile("examples/hannoi.bf")
+	if err != nil {
+		b.Fail()
+	}
+	out := &strings.Builder{}
+	i := NewInterpreter(out, nil)
+	i.Interpret(bytes.NewReader(hannoi))
+}
+
 // http://www.linusakesson.net/programming/brainfuck/output.txt
 func TestLife(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping life test in short mode")
 	}
-	// ReadFile is only used for this test
 	life, err := ioutil.ReadFile("examples/life.bf")
 	if err != nil {
 		t.Fail()
