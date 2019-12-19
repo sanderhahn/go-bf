@@ -1,13 +1,12 @@
 package bf
 
 import (
-	"bytes"
 	"errors"
 	"io"
 )
 
-const memorySize = 2048
-const bufSize = 64
+const memorySize = 1024
+const stackSize = 1024
 
 var errInvalidNesting = errors.New("Invalid loop nesting")
 
@@ -17,6 +16,9 @@ type Interpreter struct {
 	memory []byte
 	w      io.Writer
 	r      io.Reader
+	ip     int    // instruction pointer
+	code   []byte // code memory
+	stack  []int  // return stack
 }
 
 func memory() []byte {
@@ -30,6 +32,9 @@ func NewInterpreter(w io.Writer, r io.Reader) *Interpreter {
 		memory: memory(),
 		w:      w,
 		r:      r,
+		ip:     0,
+		code:   make([]byte, 0, memorySize),
+		stack:  make([]int, 0, stackSize),
 	}
 }
 
@@ -39,17 +44,15 @@ func readByte(r io.Reader) (byte, error) {
 	if n == 0 {
 		return 0, io.EOF
 	}
-	// log.Printf("byte = %c", buf[0])
 	return buf[0], err
 }
 
-func readLoop(r io.Reader) ([]byte, error) {
-	var buf = bytes.NewBuffer(make([]byte, 0, bufSize))
+func (i *Interpreter) skipLoop(r io.Reader) error {
 	level := 0
 	for {
-		code, err := readByte(r)
+		code, err := i.instr(r)
 		if err != nil {
-			return nil, err
+			return err
 		}
 		if code == '[' {
 			level++
@@ -61,9 +64,8 @@ func readLoop(r io.Reader) ([]byte, error) {
 				level--
 			}
 		}
-		buf.WriteByte(code)
 	}
-	return buf.Bytes(), nil
+	return nil
 }
 
 func writeByte(w io.Writer, b byte) error {
@@ -71,7 +73,6 @@ func writeByte(w io.Writer, b byte) error {
 	if n != 1 || err != nil {
 		return err
 	}
-	// log.Printf("write %c", b)
 	return nil
 }
 
@@ -79,15 +80,53 @@ func (i *Interpreter) increaseMemory() error {
 	// increase memory on demand
 	if i.ptr >= len(i.memory) {
 		i.memory = append(i.memory, memory()...)
-		// log.Printf("memory increased to %d\n", len(i.memory))
 	}
 	return nil
+}
+
+// instr reads and caches code instructions from the reader into code memory
+func (i *Interpreter) instr(r io.Reader) (code byte, err error) {
+	if i.ip < len(i.code) {
+		// previously read code
+		code = i.code[i.ip]
+	} else {
+		// read new instruction
+		code, err = readByte(r)
+		if err != nil {
+			return
+		}
+		// store in code memory
+		i.code = append(i.code, code)
+	}
+	i.ip++
+	return
+}
+
+func (i *Interpreter) condition() bool {
+	return i.memory[i.ptr] == 0
+}
+
+// push return position
+func (i *Interpreter) push() {
+	i.stack = append(i.stack, i.ip)
+}
+
+// jump to return position
+func (i *Interpreter) jump() {
+	top := len(i.stack) - 1
+	i.ip = i.stack[top]
+}
+
+// pop return position from the stack
+func (i *Interpreter) pop() {
+	top := len(i.stack) - 1
+	i.stack = i.stack[0:top]
 }
 
 // Interpret the instructions from the reader
 func (i *Interpreter) Interpret(r io.Reader) error {
 	for {
-		code, err := readByte(r)
+		code, err := i.instr(r)
 		if err == io.EOF {
 			break
 		}
@@ -122,18 +161,22 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 			}
 			i.memory[i.ptr] = b
 		case '[':
-			loop, err := readLoop(r)
-			if err != nil {
-				return err
-			}
-			for i.memory[i.ptr] != 0 {
-				err := i.Interpret(bytes.NewReader(loop))
-				if err != nil {
+			if i.condition() {
+				if err := i.skipLoop(r); err != nil {
 					return err
 				}
+			} else {
+				i.push()
 			}
 		case ']':
-			return errInvalidNesting
+			if len(i.stack) < 1 {
+				return errInvalidNesting
+			}
+			if i.condition() {
+				i.pop()
+			} else {
+				i.jump()
+			}
 		default:
 			// ignore comments
 		}
