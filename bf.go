@@ -9,6 +9,7 @@ const memorySize = 1024
 const stackSize = 1024
 
 var errInvalidNesting = errors.New("Invalid loop nesting")
+var errMemory = errors.New("Memory below zero unsupported")
 
 // Interpreter has the state for a single interpreter
 type Interpreter struct {
@@ -141,6 +142,9 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 			}
 		case '<':
 			i.ptr--
+			if i.ptr < 0 {
+				return errMemory
+			}
 		case '+':
 			i.memory[i.ptr]++
 		case '-':

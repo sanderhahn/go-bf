@@ -23,5 +23,6 @@ $ ./examples/mandelbrot
 ```
 
 - [Brainfuck](http://www.linusakesson.net/programming/brainfuck/index.php)
-- [Conway's Game of Life](http://pi.math.cornell.edu/~lipa/mec/lesson6.html)
+- [Brainfuck Algorithms](https://esolangs.org/wiki/Brainfuck_algorithms)
 - [Brainfuck Examples](http://esoteric.sange.fi/brainfuck/bf-source/prog/)
+- [Conway's Game of Life](http://pi.math.cornell.edu/~lipa/mec/lesson6.html)
