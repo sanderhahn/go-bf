@@ -10,6 +10,7 @@ const stackSize = 1024
 
 var errInvalidNesting = errors.New("Invalid loop nesting")
 var errMemory = errors.New("Memory below zero unsupported")
+var errExhaustedRuntime = errors.New("Runtime exhausted")
 
 // Interpreter has the state for a single interpreter
 type Interpreter struct {
@@ -93,11 +94,10 @@ func (i *Interpreter) instr(r io.Reader) (code byte, err error) {
 	} else {
 		// read new instruction
 		code, err = readByte(r)
-		if err != nil {
-			return
+		if err == nil {
+			// store in code memory
+			i.code = append(i.code, code)
 		}
-		// store in code memory
-		i.code = append(i.code, code)
 	}
 	i.ip++
 	return
@@ -126,24 +126,41 @@ func (i *Interpreter) pop() {
 
 // Interpret the instructions from the reader
 func (i *Interpreter) Interpret(r io.Reader) error {
+	_, err := i.interpret(r, true, -1)
+	return err
+}
+
+// InterpretExtended interprets the instructions from the reader in a non strict fashion
+// (non matching brackets are ignored)
+func (i *Interpreter) InterpretExtended(r io.Reader, strict bool, runtime int) (int, error) {
+	return i.interpret(r, strict, runtime)
+}
+
+func (i *Interpreter) interpret(r io.Reader, strict bool, runtime int) (int, error) {
 	for {
 		code, err := i.instr(r)
+		if runtime == 0 {
+			return runtime, errExhaustedRuntime
+		}
+		if runtime > 0 {
+			runtime--
+		}
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return err
+			return runtime, err
 		}
 		switch code {
 		case '>':
 			i.ptr++
 			if err := i.increaseMemory(); err != nil {
-				return err
+				return runtime, err
 			}
 		case '<':
 			i.ptr--
 			if i.ptr < 0 {
-				return errMemory
+				return runtime, errMemory
 			}
 		case '+':
 			i.memory[i.ptr]++
@@ -153,7 +170,7 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 			b := i.memory[i.ptr]
 			err := writeByte(i.w, b)
 			if err != nil {
-				return err
+				return runtime, err
 			}
 		case ',':
 			b, err := readByte(i.r)
@@ -161,20 +178,26 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 				// dbf2c.bf expects zero as EOF
 				b = 0
 			} else if err != nil {
-				return err
+				return runtime, err
 			}
 			i.memory[i.ptr] = b
 		case '[':
 			if i.condition() {
 				if err := i.skipLoop(r); err != nil {
-					return err
+					if err == io.EOF && !strict {
+						break
+					}
+					return runtime, err
 				}
 			} else {
 				i.push()
 			}
 		case ']':
 			if len(i.stack) < 1 {
-				return errInvalidNesting
+				if strict {
+					return runtime, errInvalidNesting
+				}
+				continue
 			}
 			if i.condition() {
 				i.pop()
@@ -185,5 +208,8 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 			// ignore comments
 		}
 	}
-	return nil
+	if len(i.stack) > 0 && strict {
+		return runtime, errInvalidNesting
+	}
+	return runtime, nil
 }
