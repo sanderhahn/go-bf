@@ -18,14 +18,14 @@ func RunPopulation(expected string, maxRuntime, maxIterations int) *Population {
 func TestHiPopulation(t *testing.T) {
 	hi := RunPopulation("hi\n", 200, 100)
 	_ = hi.Fittest().String()
-	if _, ok := hi.FittestCode(); !ok {
+	if _, ok := hi.SuccessCode(); !ok {
 		t.Fail()
 	}
 }
 
 func TestHelloWorldPopulation(t *testing.T) {
 	p := RunPopulation("hello world\n", 1000, 500)
-	if _, ok := p.FittestCode(); !ok {
+	if _, ok := p.SuccessCode(); !ok {
 		t.Fail()
 	}
 }

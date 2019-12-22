@@ -32,7 +32,7 @@ func main() {
 		population.EvaluateAndMutate()
 		fittest := population.Fittest()
 		fmt.Printf("%d: %s\n", i, fittest)
-		if code, ok := population.FittestCode(); ok {
+		if code, ok := population.SuccessCode(); ok {
 			fmt.Printf("%s\n", code)
 		}
 	}

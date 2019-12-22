@@ -97,8 +97,8 @@ func (p *Population) Fittest() *Entry {
 	return &p.entries[0]
 }
 
-// FittestCode returns the program code when success is reached
-func (p *Population) FittestCode() (Program, bool) {
+// SuccessCode returns the program code when success is reached
+func (p *Population) SuccessCode() (Program, bool) {
 	if p.Fittest().success {
 		return Normalize(p.Fittest().program), true
 	}
