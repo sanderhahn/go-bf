@@ -3,9 +3,6 @@
 The interpreter could be more efficient if the interpeter did a single pass to determine code jump locations for loops. However the assignment required the use of `io.Reader` and processing instructions without knowing all input at once. [Extended Brainfuck](https://esolangs.org/wiki/Extended_Brainfuck) requires reading the data behind the program file to initialize storage.
 
 ```bash
-# run short test
-$ go test -test.short
-
 $ go install ./...
 
 $ bf examples/life.bf
@@ -16,10 +13,14 @@ $ bf examples/mandelbrot.bf
 
 # compile bf to c
 $ bf examples/dbf2c.bf <examples/mandelbrot.bf >examples/mandelbrot.c
-
 $ gcc examples/mandelbrot.c -o examples/mandelbrot
-
 $ ./examples/mandelbrot
+
+# run short test
+$ go test -test.short
+
+# test coverage
+$ go test -test.short -cover -coverprofile=coverage.out && go tool cover -html=coverage.out
 ```
 
 - [Brainfuck](http://www.linusakesson.net/programming/brainfuck/index.php)
@@ -92,11 +93,3 @@ Actually generating programs that handle input/output in a logical way requires
 specifying interaction patterns in a language like [Expect](https://en.wikipedia.org/wiki/Expect).
 Otherwise the generator will just use input as source of integer values and
 this doesn't result in programs that perform meaningful interactions.
-
-## Development
-
-Visualize test coverage:
-
-```bash
-go test -test.short -cover -coverprofile=coverage.out && go tool cover -html=coverage.out
-```
