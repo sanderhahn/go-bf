@@ -5,8 +5,37 @@ import (
 	"math/rand"
 )
 
+// Instr represents a instruction
+type Instr byte
+
+const instr = `><+-.[]`
+
+// RandomInstr returns a random instruction
+func RandomInstr() byte {
+	return instr[rand.Intn(len(instr))]
+}
+
 // Program represents a program
 type Program []byte
+
+// NewProgram constructs empty program
+func NewProgram() Program {
+	return make([]byte, 0, 128)
+}
+
+// NewProgramClone clones a program
+func NewProgramClone(source Program) Program {
+	return append(NewProgram(), source...)
+}
+
+// NewRandomProgram makes a random program
+func NewRandomProgram(length int) Program {
+	p := NewProgram()
+	for i := 0; i < length; i++ {
+		p = append(p, RandomInstr())
+	}
+	return p
+}
 
 // Normalize the code to be syntactically valid with respect to loops
 func Normalize(program Program) Program {
@@ -46,77 +75,70 @@ func Normalize(program Program) Program {
 	return buf.Bytes()
 }
 
-var instr = `><+-.[]`
-
-func randomInstr() byte {
-	return instr[rand.Intn(len(instr))]
+func insertAt(a Program, pos int, b Program) Program {
+	return append(a[:pos], append(b, a[pos:]...)...)
 }
 
-func randomCode(length int) Program {
-	buf := make([]byte, 0, 128)
-	for i := 0; i < length; i++ {
-		buf = append(buf, randomInstr())
-	}
-	return buf
+func removeAt(p Program, pos, len int) Program {
+	return append(p[0:pos], p[pos+len:]...)
 }
 
-func insertAt(code Program, pos int, program Program) Program {
-	return append(code[:pos], append(program, code[pos:]...)...)
+func replaceAt(a Program, pos int, len int, b Program) Program {
+	c := removeAt(a, pos, len)
+	return insertAt(c, pos, b)
 }
 
-func removeAt(code Program, pos, len int) Program {
-	return append(code[0:pos], code[pos+len:]...)
-}
-
-var componds = []Program{
+var compounds = []Program{
 	Program(`[-]`),                     // set zero
 	Program(`>++++[<++++>-]<`),         // add 0x10
 	Program(`>++++[<++++++++>-]<`),     // add 0x20
 	Program(`>++++++++[<++++++++>-]<`), // add 0x40
 }
 
-func comment(code Program) Program {
-	return append(append(Program(`[-][`), code...), ']')
+// Comment out a program
+func (p Program) Comment() Program {
+	return append(append(Program(`[-][`), p...), ']')
 }
 
-func mutate(code Program, keep []Entry) Program {
+// Mutate a program randomly
+func Mutate(code Program, sources []Entry) Program {
 	if len(code) == 0 {
-		return randomCode(1)
+		return NewRandomProgram(1)
 	}
+
 	pos := rand.Intn(len(code))
 
 	switch rand.Intn(8) {
 	case 0:
-		return insertAt(code, pos, Program{randomInstr()})
+		return insertAt(code, pos, NewRandomProgram(1))
 	case 1:
-		if len(code) > 1 {
-			return removeAt(code, pos, 1)
-		}
-		return randomCode(1)
+		return removeAt(code, pos, 1)
 	case 2:
-		code[pos] = randomInstr()
-		return code
+		p := NewProgramClone(code)
+		p[pos] = RandomInstr()
+		return p
 	case 3:
 		apos := rand.Intn(len(code))
 		len := rand.Intn(len(code) - apos)
 		return insertAt(code, pos, code[apos:apos+len])
 	case 4:
 		// cross breed
-		pick := rand.Intn(len(keep))
-		return insertAt(code, pos, keep[pick].program)
+		pick := rand.Intn(len(sources))
+		return insertAt(code, pos, sources[pick].program)
 	case 5:
 		len := rand.Intn(len(code) - pos)
 		return removeAt(code, pos, len)
 	case 6:
 		// insert some loops for variety
-		c := rand.Intn(len(componds))
-		return insertAt(code, pos, componds[c])
+		c := rand.Intn(len(compounds))
+		return insertAt(code, pos, compounds[c])
 	case 7:
 		// comment out selection instead of delete
 		len := rand.Intn(len(code) - pos)
-		commented := comment(code[pos : pos+len])
+		commented := code[pos : pos+len].Comment()
 		without := removeAt(code, pos, len)
 		return insertAt(without, pos, commented)
 	}
-	return code
+	panic("unreachable")
+	// return code
 }

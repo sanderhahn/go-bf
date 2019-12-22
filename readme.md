@@ -90,3 +90,11 @@ Actually generating programs that handle input/output in a logical way requires
 specifying interaction patterns in a language like [Expect](https://en.wikipedia.org/wiki/Expect).
 Otherwise the generator will just use input as source of integer values and
 this doesn't result in programs that perform meaningful interactions.
+
+## Development
+
+Visualize test coverage:
+
+```bash
+go test -test.short -cover -coverprofile=coverage.out && go tool cover -html=coverage.out
+```

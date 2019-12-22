@@ -85,7 +85,7 @@ func (e byFitness) Less(i, j int) bool {
 func NewPopulation() *Population {
 	entries := make([]Entry, populationSize)
 	for i := range entries {
-		entries[i].program = randomCode(1)
+		entries[i].program = NewRandomProgram(1)
 	}
 	return &Population{
 		entries: entries,
@@ -126,11 +126,11 @@ func (p *Population) EvaluateAndMutate() {
 			entry := &p.entries[(m*keepSize)+i]
 			if m == 1 {
 				// new generation
-				entry.program = randomCode(1)
+				entry.program = NewRandomProgram(1)
 				entry.generation = 0
 			} else {
 				entry.program = append(Program{}, keepEntry.program...)
-				entry.program = mutate(entry.program, p.entries[0:keepSize])
+				entry.program = Mutate(entry.program, p.entries[0:keepSize])
 				entry.generation = keepEntry.generation
 			}
 		}
