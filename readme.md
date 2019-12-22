@@ -6,7 +6,7 @@ The interpreter could be more efficient if the interpeter did a single pass to d
 # run short test
 $ go test -test.short
 
-$ go install github.com/sanderhahn/bf/...
+$ go install ./...
 
 $ bf examples/life.bf
 

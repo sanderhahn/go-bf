@@ -1,3 +1,3 @@
-module github.com/sanderhahn/bf
+module github.com/sanderhahn/go-bf
 
 go 1.13

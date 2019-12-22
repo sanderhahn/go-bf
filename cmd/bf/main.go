@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/sanderhahn/bf"
+	"github.com/sanderhahn/go-bf"
 )
 
 func main() {

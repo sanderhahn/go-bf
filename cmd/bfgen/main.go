@@ -9,7 +9,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/sanderhahn/bf"
+	"github.com/sanderhahn/go-bf"
 )
 
 const iterations = 10000
