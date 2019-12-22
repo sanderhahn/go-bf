@@ -30,7 +30,7 @@ $ go test -test.short -cover -coverprofile=coverage.out && go tool cover -html=c
 
 ## Genetic Programming
 
-This extra tool for generating programs was inspired by the research paper
+Th `bfgen` tool for generating programs was inspired by the research paper
 [AI Programmer: Autonomously CreatingSoftware Programs Using Genetic Algorithms](https://arxiv.org/pdf/1709.05703.pdf).
 More information is available at [Using Artificial Intelligence to Write Self-Modifying/Improving Programs](http://www.primaryobjects.com/2013/01/27/using-artificial-intelligence-to-write-self-modifying-improving-programs/).
 
@@ -39,7 +39,7 @@ genetic evolution in a population of random programs to adapt them into
 programs that are increasingly more fit to solve a problem. The fitness of a program
 is calculated to see how good the solution is with respect to a certain outcome.
 Mutations are introduced in the population by imperfect copying of existing
-code. The most fit programs are selected and crossbreed to evolve possibly
+code. The most fit programs are selected and crossbred to evolve into possibly
 better programs.
 
 The brainfuck interpreter is extended to allow more sloppy versions of the code.
@@ -65,7 +65,7 @@ $ echo "I Feel Like a Computer" | bfgen
 
 <!-- https://www.youtube.com/watch?v=G0-PxhDZV00 -->
 
-The runtime defaults to 10000, but sometimes its benefitial to limit the runtime
+The runtime defaults to 10000, but sometimes its beneficial to limit the runtime
 to fit simpler texts.
 
 ```bash
