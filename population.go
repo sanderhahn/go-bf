@@ -41,7 +41,7 @@ func NewPopulation() *Population {
 	return &Population{
 		entries:         entries,
 		MaxRuntime:      10000,
-		MaxManipulation: 5,
+		MaxManipulation: 1,
 	}
 }
 
@@ -83,7 +83,11 @@ func (p *Population) EvaluateAndMutate() {
 				entry.generation = 0
 			} else {
 				entry.program = append(Program{}, keepEntry.program...)
-				entry.program = Mutate(entry.program, rand.Intn(p.MaxManipulation)+1, p.entries[0:keepSize])
+				manipulation := rand.Intn(p.MaxManipulation)
+				if manipulation == 0 {
+					manipulation++
+				}
+				entry.program = Mutate(entry.program, manipulation, p.entries[0:keepSize])
 				entry.generation = keepEntry.generation
 			}
 		}
