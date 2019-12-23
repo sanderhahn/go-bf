@@ -12,6 +12,7 @@ func (e *Entry) exec(input string, maxRuntime int) error {
 	output := &strings.Builder{}
 	i := NewInterpreter(output, bytes.NewReader([]byte(input)))
 	runtime, err := i.InterpretExtended(bytes.NewReader(e.program), false, maxRuntime)
+	e.err = err
 	if err == nil {
 		e.runtime = maxRuntime - runtime
 		e.output = output.String()
@@ -19,7 +20,7 @@ func (e *Entry) exec(input string, maxRuntime int) error {
 		e.runtime = 0
 		e.output = ""
 	}
-	return e.err
+	return err
 }
 
 func (e *Entry) calculateFitness(expected string) {

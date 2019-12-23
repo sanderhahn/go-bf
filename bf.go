@@ -131,7 +131,7 @@ func (i *Interpreter) Interpret(r io.Reader) error {
 }
 
 // InterpretExtended interprets the instructions from the reader in a non strict fashion
-// (non matching brackets are ignored)
+// (non matching brackets are ignored). Runtime of -1 means unrestricted.
 func (i *Interpreter) InterpretExtended(r io.Reader, strict bool, runtime int) (int, error) {
 	return i.interpret(r, strict, runtime)
 }

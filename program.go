@@ -140,5 +140,4 @@ func Mutate(code Program, sources []Entry) Program {
 		return insertAt(without, pos, commented)
 	}
 	panic("unreachable")
-	// return code
 }

@@ -88,6 +88,11 @@ func TestRuntime(t *testing.T) {
 	if out.String() != "\003" {
 		t.Fail()
 	}
+	i = NewInterpreter(out, nil)
+	_, err = i.InterpretExtended(code(`+[]`), true, 10)
+	if err != errExhaustedRuntime {
+		t.Fail()
+	}
 }
 
 func calc(memory []byte, program string, expected []byte) error {
