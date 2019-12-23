@@ -2,14 +2,16 @@ package bf
 
 import "testing"
 
-func RunPopulation(expected string, maxRuntime, maxIterations int) *Population {
+import "fmt"
+
+func runPopulation(expected string, maxRuntime, maxIterations int, stopOnSuccess bool) *Population {
 	p := NewPopulation()
 	p.Expected = expected
 	p.MaxRuntime = maxRuntime
 	p.MaxManipulation = 1
 	for i := 1; i < maxIterations; i++ {
 		p.EvaluateAndMutate()
-		if p.Fittest().success {
+		if stopOnSuccess && p.Fittest().success {
 			break
 		}
 	}
@@ -17,7 +19,7 @@ func RunPopulation(expected string, maxRuntime, maxIterations int) *Population {
 }
 
 func TestHiPopulation(t *testing.T) {
-	hi := RunPopulation("hi\n", 200, 100)
+	hi := runPopulation("hi\n", 200, 100, true)
 	_ = hi.Fittest().String()
 	if _, ok := hi.SuccessCode(); !ok {
 		t.Fail()
@@ -25,8 +27,21 @@ func TestHiPopulation(t *testing.T) {
 }
 
 func TestHelloWorldPopulation(t *testing.T) {
-	p := RunPopulation("hello world\n", 1000, 500)
+	p := runPopulation("hello world\n", 1000, 500, true)
 	if _, ok := p.SuccessCode(); !ok {
 		t.Fail()
+	}
+}
+
+func BenchmarkAscii(b *testing.B) {
+	// Finding an optimal solution might require multiple runs
+	for i := ' '; i <= '~'; i++ {
+		s := string(i)
+		p := runPopulation(s, 200, 50, false)
+		code, ok := p.SuccessCode()
+		if !ok {
+			b.FailNow()
+		}
+		fmt.Printf("%c = %s\n", i, code)
 	}
 }
