@@ -25,18 +25,27 @@ func (e *Entry) exec(input string, maxRuntime int) error {
 
 func (e *Entry) calculateFitness(expected string) {
 	fitness := 0.0
+	factor := 1.0
+	ok := true
 	for i, ch := range []byte(expected) {
 		if i < len(e.output) {
-			diff := math.Abs(float64(ch)-float64(e.output[i])) / 255.0
-			fitness += (1.0 - diff)
-			fitness *= 3.0
+			ok = ok && ch == e.output[i]
+			if ok {
+				fitness += 1.0
+			} else {
+				diff := math.Abs(float64(ch)-float64(e.output[i])) / 255.0
+				fitness += ((1.0 - diff) / factor)
+				factor *= 10
+			}
+		} else {
+			ok = false
 		}
 	}
 
 	lenOutput := float64(len(e.output))
 	lenExpected := float64(len(expected))
 	if lenOutput > lenExpected {
-		fitness *= (1.0 - (lenOutput / lenExpected))
+		fitness += ((1.0 - (lenOutput / lenExpected)) / factor)
 	}
 
 	if e.success {
