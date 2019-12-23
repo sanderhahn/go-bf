@@ -6,7 +6,6 @@ import (
 	"math"
 	"math/rand"
 	"sort"
-	"strings"
 )
 
 const keepSize = 32
@@ -16,7 +15,7 @@ const populationSize = keepSize * manipulationSize
 // Population maintains the pool of programs in the form of entries
 type Population struct {
 	entries         []Entry
-	Expected        string
+	Expected        []byte
 	MaxRuntime      int
 	MaxManipulation int
 }
@@ -24,7 +23,7 @@ type Population struct {
 // Entry maintains information of a program
 type Entry struct {
 	program    Program
-	output     string
+	output     []byte
 	runtime    int
 	err        error
 	fitness    float64
@@ -64,7 +63,7 @@ func (p *Population) EvaluateAndMutate() {
 		entry := &p.entries[i]
 		entry.fitness = 0.0
 		entry.err = entry.exec("", p.MaxRuntime)
-		entry.success = entry.err == nil && entry.output == p.Expected
+		entry.success = entry.err == nil && bytes.Equal(entry.output, p.Expected)
 		if entry.err == nil {
 			entry.calculateFitness(p.Expected)
 		}
@@ -95,16 +94,16 @@ func (p *Population) EvaluateAndMutate() {
 }
 
 func (e *Entry) exec(input string, maxRuntime int) error {
-	output := &strings.Builder{}
+	output := bytes.NewBuffer([]byte{})
 	i := NewInterpreter(output, bytes.NewReader([]byte(input)))
 	runtime, err := i.InterpretExtended(bytes.NewReader(e.program), false, maxRuntime)
 	e.err = err
 	if err == nil {
 		e.runtime = maxRuntime - runtime
-		e.output = output.String()
+		e.output = output.Bytes()
 	} else {
 		e.runtime = 0
-		e.output = ""
+		e.output = []byte{}
 	}
 	return err
 }
@@ -114,11 +113,11 @@ func characterFitness(expected, actual byte) float64 {
 	return 1.0 - diff
 }
 
-func (e *Entry) calculateFitness(expected string) {
+func (e *Entry) calculateFitness(expected []byte) {
 	fitness := 0.0
 	factor := 1.0
 	ok := true
-	for i, ch := range []byte(expected) {
+	for i, ch := range expected {
 		if i < len(e.output) {
 			ok = ok && ch == e.output[i]
 			if ok {
@@ -138,15 +137,17 @@ func (e *Entry) calculateFitness(expected string) {
 		fitness += (1.0 - (lenOutput / lenExpected))
 	}
 
-	factor *= 10
-	weight := 1.0 / float64(len(e.program)+1)
-	fitness += (weight / factor)
+	if fitness > 0 {
+		factor *= 10
+		weight := 1.0 / float64(len(e.program)+1)
+		fitness += (weight / factor)
+	}
 
 	e.fitness = fitness
 }
 
 func (e *Entry) String() string {
-	return fmt.Sprintf("output = %#v fitness = %f runtime = %d generation = %d", e.output, e.fitness, e.runtime, e.generation)
+	return fmt.Sprintf("output = %#v fitness = %f runtime = %d generation = %d", string(e.output), e.fitness, e.runtime, e.generation)
 }
 
 type byFitness []Entry

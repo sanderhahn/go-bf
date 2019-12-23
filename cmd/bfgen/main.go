@@ -23,7 +23,7 @@ func main() {
 	}
 
 	population := bf.NewPopulation()
-	population.Expected = string(expected)
+	population.Expected = expected
 
 	flag.IntVar(&population.MaxRuntime, "runtime", 10000, "max runtime for program")
 	flag.IntVar(&population.MaxManipulation, "manipulation", 1, "max manipulation when copying")

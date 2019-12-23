@@ -89,6 +89,9 @@ func replaceAt(a Program, pos int, len int, b Program) Program {
 }
 
 var compounds = []Program{
+	Program(`>++++++++[<-------->-]<`), // sub 0x40
+	Program(`>++++[<-------->-]<`),     // sub 0x20
+	Program(`>++++[<---->-]<`),         // sub 0x10
 	Program(`[-]`),                     // set zero
 	Program(`>++++[<++++>-]<`),         // add 0x10
 	Program(`>++++[<++++++++>-]<`),     // add 0x20

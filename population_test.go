@@ -4,7 +4,7 @@ import "testing"
 
 import "fmt"
 
-func runPopulation(expected string, maxRuntime, maxIterations int, stopOnSuccess bool) *Population {
+func runPopulation(expected []byte, maxRuntime, maxIterations int, stopOnSuccess bool) *Population {
 	p := NewPopulation()
 	p.Expected = expected
 	p.MaxRuntime = maxRuntime
@@ -19,7 +19,7 @@ func runPopulation(expected string, maxRuntime, maxIterations int, stopOnSuccess
 }
 
 func TestHiPopulation(t *testing.T) {
-	hi := runPopulation("hi\n", 200, 100, true)
+	hi := runPopulation([]byte("hi\n"), 200, 100, true)
 	_ = hi.Fittest().String()
 	if _, ok := hi.SuccessCode(); !ok {
 		t.Fail()
@@ -27,28 +27,39 @@ func TestHiPopulation(t *testing.T) {
 }
 
 func TestHelloWorldPopulation(t *testing.T) {
-	p := runPopulation("hello world\n", 1000, 500, true)
+	p := runPopulation([]byte("hello world\n"), 1000, 500, true)
 	if _, ok := p.SuccessCode(); !ok {
 		t.Fail()
 	}
 }
 
+func TestHighByte(t *testing.T) {
+	p := runPopulation([]byte{byte(0xff)}, 256, 200, false)
+	_, ok := p.SuccessCode()
+	if !ok {
+		t.Fail()
+	}
+}
+
 func BenchmarkAscii(b *testing.B) {
+	// https://esolangs.org/wiki/Brainfuck_constants
 	// Finding an optimal solution might require multiple runs
-	for i := ' '; i <= '~'; i++ {
-		s := string(i)
-		p := runPopulation(s, 200, 50, false)
+	for i := 0; i <= 255; i++ {
+		p := runPopulation([]byte{byte(i)}, 256, 200, false)
 		code, ok := p.SuccessCode()
 		if !ok {
 			b.FailNow()
 		}
-		fmt.Printf("%c = %s\n", i, code)
+		fmt.Printf("%d = %s\n", i, code)
 	}
 }
 
 func TestCharacterFitness(t *testing.T) {
 	// byte overflows are considered
 	if characterFitness('\x80', '\xff') < characterFitness('\x80', '\x00') {
+		t.Fail()
+	}
+	if characterFitness('\xf2', '\xff') < characterFitness('\xf2', '\x00') {
 		t.Fail()
 	}
 }
