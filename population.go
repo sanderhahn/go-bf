@@ -48,11 +48,9 @@ func (e *Entry) calculateFitness(expected string) {
 		fitness += ((1.0 - (lenOutput / lenExpected)) / factor)
 	}
 
-	if e.success {
-		// optimize for program length once successful
-		weight := 1.0 / float64(len(e.program))
-		fitness += weight
-	}
+	factor *= 10
+	weight := 1.0 / float64(len(e.program)+1)
+	fitness += (weight / factor)
 
 	e.fitness = fitness
 }
