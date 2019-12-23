@@ -91,6 +91,19 @@ EOF
 ++++++>-]>+++++++>+++++++[<+++++++>-]<......<<..<<<.<......<+++++++>...<++.
 ```
 
+```bash
+# Benchmark add print all byte value representations
+$ go test -benchmem -run=^$ github.com/sanderhahn/go-bf -bench "^(BenchmarkAscii)$"
+```
+
+```
+0x00 = .
+0x01 = +.
+0x02 = ++.
+0x03 = +++.
+...
+```
+
 ## Limitations
 
 There is only one pool so its possible that the population will get stuck in

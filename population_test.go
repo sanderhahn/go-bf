@@ -45,12 +45,12 @@ func BenchmarkAscii(b *testing.B) {
 	// https://esolangs.org/wiki/Brainfuck_constants
 	// Finding an optimal solution might require multiple runs
 	for i := 0; i <= 255; i++ {
-		p := runPopulation([]byte{byte(i)}, 256, 200, false)
+		p := runPopulation([]byte{byte(i)}, 256, 20, false)
 		code, ok := p.SuccessCode()
 		if !ok {
 			b.FailNow()
 		}
-		fmt.Printf("%d = %s\n", i, code)
+		fmt.Printf("0x%02x = %s\n", i, code)
 	}
 }
 
