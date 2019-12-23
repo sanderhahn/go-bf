@@ -45,7 +45,7 @@ func (e *Entry) calculateFitness(expected string) {
 	lenOutput := float64(len(e.output))
 	lenExpected := float64(len(expected))
 	if lenOutput > lenExpected {
-		fitness += ((1.0 - (lenOutput / lenExpected)) / factor)
+		fitness += (1.0 - (lenOutput / lenExpected))
 	}
 
 	factor *= 10
