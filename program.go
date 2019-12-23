@@ -95,13 +95,25 @@ var compounds = []Program{
 	Program(`>++++++++[<++++++++>-]<`), // add 0x40
 }
 
+// Loop a program
+func (p Program) Loop() Program {
+	return append(append(Program(`[`), p...), ']')
+}
+
 // Comment out a program
 func (p Program) Comment() Program {
 	return append(append(Program(`[-][`), p...), ']')
 }
 
-// Mutate a program randomly
-func Mutate(code Program, sources []Entry) Program {
+// Mutate a program randomly a number of times
+func Mutate(code Program, times int, sources []Entry) Program {
+	for i := 0; i < times; i++ {
+		code = mutate(code, sources)
+	}
+	return code
+}
+
+func mutate(code Program, sources []Entry) Program {
 	if len(code) == 0 {
 		return NewRandomProgram(1)
 	}

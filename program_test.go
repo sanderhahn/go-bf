@@ -54,7 +54,7 @@ func TestMutateAt(t *testing.T) {
 	// run some mutations to inflate coverage
 	for i := 0; i < 50; i++ {
 		p := NewRandomProgram(2)
-		Mutate(p, []Entry{Entry{program: Program(`x`)}})
+		Mutate(p, 1, []Entry{Entry{program: Program(`x`)}})
 	}
-	Mutate(Program(``), []Entry{})
+	Mutate(Program(``), 1, []Entry{})
 }

@@ -6,6 +6,7 @@ func RunPopulation(expected string, maxRuntime, maxIterations int) *Population {
 	p := NewPopulation()
 	p.Expected = expected
 	p.MaxRuntime = maxRuntime
+	p.MaxManipulation = 1
 	for i := 1; i < maxIterations; i++ {
 		p.EvaluateAndMutate()
 		if p.Fittest().success {

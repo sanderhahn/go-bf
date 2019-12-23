@@ -26,6 +26,7 @@ func main() {
 	population.Expected = string(expected)
 
 	flag.IntVar(&population.MaxRuntime, "runtime", 10000, "max runtime for program")
+	flag.IntVar(&population.MaxManipulation, "manipulation", 5, "max manipulation when copying")
 	flag.Parse()
 
 	for i := 1; i <= iterations; i++ {
