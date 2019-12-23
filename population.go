@@ -109,6 +109,11 @@ func (e *Entry) exec(input string, maxRuntime int) error {
 	return err
 }
 
+func characterFitness(expected, actual byte) float64 {
+	diff := math.Abs(float64(expected)-float64(actual)) / 255.0
+	return 1.0 - diff
+}
+
 func (e *Entry) calculateFitness(expected string) {
 	fitness := 0.0
 	factor := 1.0
@@ -119,8 +124,7 @@ func (e *Entry) calculateFitness(expected string) {
 			if ok {
 				fitness += 1.0
 			} else {
-				diff := math.Abs(float64(ch)-float64(e.output[i])) / 255.0
-				fitness += ((1.0 - diff) / factor)
+				fitness += (characterFitness(ch, e.output[i]) / factor)
 				factor *= 10
 			}
 		} else {

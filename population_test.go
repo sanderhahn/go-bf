@@ -45,3 +45,10 @@ func BenchmarkAscii(b *testing.B) {
 		fmt.Printf("%c = %s\n", i, code)
 	}
 }
+
+func TestCharacterFitness(t *testing.T) {
+	// byte overflows are considered
+	if characterFitness('\x80', '\xff') < characterFitness('\x80', '\x00') {
+		t.Fail()
+	}
+}
