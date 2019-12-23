@@ -107,6 +107,7 @@ func Mutate(code Program, sources []Entry) Program {
 	}
 
 	pos := rand.Intn(len(code))
+	length := rand.Intn(len(code) - pos)
 
 	switch rand.Intn(8) {
 	case 0:
@@ -126,18 +127,14 @@ func Mutate(code Program, sources []Entry) Program {
 		pick := rand.Intn(len(sources))
 		return insertAt(code, pos, sources[pick].program)
 	case 5:
-		len := rand.Intn(len(code) - pos)
-		return removeAt(code, pos, len)
+		return removeAt(code, pos, length)
 	case 6:
 		// insert some loops for variety
 		c := rand.Intn(len(compounds))
 		return insertAt(code, pos, compounds[c])
 	case 7:
-		// comment out selection instead of delete
-		len := rand.Intn(len(code) - pos)
-		commented := code[pos : pos+len].Comment()
-		without := removeAt(code, pos, len)
-		return insertAt(without, pos, commented)
+		without := removeAt(code, pos, length)
+		return insertAt(without, pos, code[pos:pos+length].Comment())
 	}
 	panic("unreachable")
 }
