@@ -14,10 +14,10 @@ const populationSize = keepSize * manipulationSize
 
 // Population maintains the pool of programs in the form of entries
 type Population struct {
-	entries         []Entry
-	Expected        []byte
-	MaxRuntime      int
-	MaxManipulation int
+	entries       []Entry
+	Expected      []byte
+	MaxRuntime    int
+	MaxManipulate int
 }
 
 // Entry maintains information of a program
@@ -38,9 +38,9 @@ func NewPopulation() *Population {
 		entries[i].program = NewRandomProgram(1)
 	}
 	return &Population{
-		entries:         entries,
-		MaxRuntime:      10000,
-		MaxManipulation: 1,
+		entries:       entries,
+		MaxRuntime:    10000,
+		MaxManipulate: 1,
 	}
 }
 
@@ -82,7 +82,7 @@ func (p *Population) EvaluateAndMutate() {
 				entry.generation = 0
 			} else {
 				entry.program = append(Program{}, keepEntry.program...)
-				manipulation := rand.Intn(p.MaxManipulation)
+				manipulation := rand.Intn(p.MaxManipulate)
 				if manipulation == 0 {
 					manipulation++
 				}

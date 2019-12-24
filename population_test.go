@@ -8,7 +8,7 @@ func runPopulation(expected []byte, maxRuntime, maxIterations int, stopOnSuccess
 	p := NewPopulation()
 	p.Expected = expected
 	p.MaxRuntime = maxRuntime
-	p.MaxManipulation = 1
+	p.MaxManipulate = 1
 	for i := 1; i < maxIterations; i++ {
 		p.EvaluateAndMutate()
 		if stopOnSuccess && p.Fittest().success {
