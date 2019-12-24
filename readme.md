@@ -65,8 +65,11 @@ $ echo "I Feel Like a Computer" | bfgen
 
 <!-- https://www.youtube.com/watch?v=G0-PxhDZV00 -->
 
-The runtime defaults to 10000, but sometimes its beneficial to limit or extend
-it fit the length of the text.
+The `-runtime` parameter defaults to 10000, but sometimes its beneficial to
+limit or extend it to fit the length of the text.
+The amount of manipulation can be controlled using `-manipulate`.
+Higher manipulation will result in more random programs and will take more time
+to converge. However the final program can also be a more compact.
 
 ```bash
 $ cat <<EOF | bfgen -runtime 20000
@@ -83,12 +86,9 @@ EOF
 ```
 
 ```
-+>++++++[<++++++++>-]<.>++++++++++.>+>+++++++[<+++++++>-]<..>>+<++++++++++.>+>++
-+++++[<+++++++>-]<...[+]>+<++++++++++.>+++++[<+++++++>-]<....>++++++++++.<+.>++>
--<<...>+>++++++[<++++++++>-]<.>+<[-]>+<++++++++++.<[+]+>>++>+++++++[<+++++++>-]>
-+++++>+++++++[<+++++++>-]<....<<+..[-]++++++++++.<[+]>++++[<++++>-]+++++++<+>+++
->>[-]->+++++++[<++++++++>-]<.>>+<+++>-<<......>+<[-]>+<++++++++++.>++>+++++++[<+
-++++++>-]>+++++++>+++++++[<+++++++>-]<......<<..<<<.<......<+++++++>...<++.
+>+++++++[<+++++++>-]<.>++++++++++.>+>+++++++[<+++++++>-]<..<.>+...>++++++++++.<+
+....>[-]++++++<+>++++.[+]<.>+<....>+++++<+>++++.<......>.<+.......>.<+....>[-]<.
+...>++++++<+>++++.<.........>.
 ```
 
 ```bash

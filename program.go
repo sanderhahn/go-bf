@@ -138,9 +138,12 @@ func mutate(code Program, sources []Entry) Program {
 		len := rand.Intn(len(code) - apos)
 		return insertAt(code, pos, code[apos:apos+len])
 	case 4:
-		// cross breed
-		pick := rand.Intn(len(sources))
-		return insertAt(code, pos, sources[pick].program)
+		// cross breed partials
+		pick := NewProgramClone(sources[rand.Intn(len(sources))].program)
+		pickPos := rand.Intn(len(pick))
+		pickLength := rand.Intn(len(pick) - pickPos)
+		without := removeAt(code, pos, length)
+		return insertAt(without, pos, pick[pickPos:pickPos+pickLength])
 	case 5:
 		return removeAt(code, pos, length)
 	case 6:

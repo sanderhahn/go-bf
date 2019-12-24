@@ -40,7 +40,7 @@ func NewPopulation() *Population {
 	return &Population{
 		entries:       entries,
 		MaxRuntime:    10000,
-		MaxManipulate: 1,
+		MaxManipulate: 3,
 	}
 }
 
